@@ -1,0 +1,59 @@
+\---------------------------\
+\ Hangman game in BrainClub \
+\---------------------------\
+
+\ Subroutines
+: UPPERCASE DUP 96 > IF 32 - THEN ;
+: YOUWIN 1EMPH ."You win!" BEGIN {,} AGAIN ;
+: YOULOSE CR 1EMPH ."You lose!" BEGIN {,} AGAIN ;
+
+\ Declare variables
+( LIVES 1 )VAR
+( LETTER 1 )VAR
+( CORRECTLETTER 1 )VAR
+( BLANKS 1 )VAR
+( WORDLENGTH 1 )VAR
+( DISPLAYWORD 36 )VAR
+( WORD 36 )VAR
+
+\ Initialize some variables
+7 ( ! )LIVES
+
+\ Read word to play game with
+BEGIN
+  ( 1+ )WORDLENGTH
+  INPUT DUP
+  ( @ )WORDLENGTH INDEX ( ! )WORD ?"." ( ! )DISPLAYWORD OUTDEX
+  ?"!" =
+UNTIL
+( 1- @ )WORDLENGTH ( ! )BLANKS
+
+\ Main game loop
+BEGIN
+  CLS 1EMPH ."  HANGMAN!  " 0EMPH CR
+  ." <"
+  ( ZERO )BLANKS
+  0 BEGIN
+    1+
+    DUP INDEX ( OUTPUT @ )DISPLAYWORD OUTDEX
+    ?"." = IF ( 1+ )BLANKS THEN
+    DUP ( @ )WORDLENGTH =
+  UNTIL DROP
+  .">" CR
+  ."Lives: " ( @ )LIVES ?"0" + EMIT CR
+  ( @ )BLANKS 0= IF YOUWIN THEN
+  ."Guess a letter: " INPUT UPPERCASE OUTPUT
+  ( ZERO )CORRECTLETTER
+  0 BEGIN
+    1+
+    DUP INDEX ( @ )WORD OUTDEX
+    ( 2 )PICK = IF
+      2DUP INDEX ( ! )DISPLAYWORD OUTDEX
+      ( 1+ )CORRECTLETTER ( 1- )BLANKS
+    THEN
+    DUP ( @ )WORDLENGTH =
+  UNTIL DROP DROP
+  ( @ )CORRECTLETTER 0= IF
+    ( 1- @ )LIVES 0= IF YOULOSE THEN
+  THEN
+AGAIN
